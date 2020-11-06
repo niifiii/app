@@ -8,3 +8,10 @@
         {{/each}}
 </table>
 
+<form method="get" action="/bookslist/{{startChar}}/{{backnext.back}}">
+    <button type='submit'> Back </button>
+</form>
+
+<form method="get" action="/bookslist/{{startChar}}/{{backnext.next}}">
+    <button type='submit'> Next </button>
+</form>

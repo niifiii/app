@@ -90,13 +90,13 @@ app.get('/', (req, res) => {
         numbers: NumbersIntegers
     })
 
-    console.info(Alphabets, NumbersIntegers)
+    //console.info(Alphabets, NumbersIntegers)
     
 })
 
 app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
     const conn = await pool.getConnection();
-    console.log('here:' + req.params.startCharOfBookTitle)
+    //console.log('here:' + req.params.startCharOfBookTitle)
     try {
         const startChar = req.params.startCharOfBookTitle;
         //console.log(startChar)
@@ -114,6 +114,51 @@ app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
         //console.log(records);
         res.render('bookslist', {
             records: records,
+        })
+
+    } catch (e) {
+        console.error('error',  e); 
+
+    } finally {
+        await conn.release()
+
+    }
+})
+
+app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
+    const conn = await pool.getConnection();
+    //console.log('here:' + req.params.startCharOfBookTitle)
+    try {
+        const startChar = req.params.startCharOfBookTitle;
+        const page = req.params.page;
+        console.info(page, startChar);
+
+        res.status(200);
+        res.type('text/html');
+        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
+
+        
+        const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
+        //console.log(JSON.stringify(result[0]));
+        const records = [];
+        for (let item of result[0]) {
+            records.push(item.title);
+        }
+        let numberOfRecords = records.length;
+        let numberOfPages = numberOfRecords / 10;
+        const pageInt = parseInt(page);
+        if (!(pageInt < 0 || pageInt > numberOfPages)) {
+            var partialRecords = records.slice(((pageInt -1) * 10) + 0, ((pageInt -1)* 10) + 11);
+        }
+
+        //console.log(partialRecords);
+        res.render('bookslist', {
+            startChar: startChar,
+            records: partialRecords,
+            backnext: { 
+                back: pageInt - 1,
+                next: pageInt + 1
+            },
         })
 
     } catch (e) {
