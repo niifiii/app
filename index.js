@@ -102,19 +102,27 @@ app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
         //console.log(startChar)
         res.status(200);
         res.type('text/html');
-        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
+        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title, book_id FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
 
         const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
-        //console.log(JSON.stringify(result[0]));
-        const records = [];
-        for (let item of result[0]) {
-            records.push(item.title);
-        }
-        var partialRecords = records.slice(0, 11);
+        //console.log('here' + JSON.stringify(result[0]));///////////////////////////////////////////
+        //const records = [];
+        //const bookIDs = [];
+        //for (let item of result[0]) {
+        //    records.push(item.title);
+        //    bookIDs.push(item.bookID)
+        //}
+        //var partialRecords = records.slice(0, 11);
+        //var partialBookIDs = bookIDs.slice(0, 11);
+        //console.log('typeof: ' + typeof result[0]) <-- this is an object
+        let records = result[0];
+        let partialRecords = records.slice(0, 11);
 
         res.render('bookslist', {
             startChar: startChar,
-            records: partialRecords,
+            //results: result[0],
+            results: partialRecords,
+            //bookIDs: partialBookIDs,
             backnext: { 
                 back: 0,
                 next: 2
@@ -136,18 +144,19 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
     try {
         const startChar = req.params.startCharOfBookTitle;
         const page = req.params.page;
-        console.info(page, startChar);
+        //console.info(page, startChar);
 
         res.status(200);
         res.type('text/html');
-        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
+        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title, book_id FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
 
         const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
         //console.log(JSON.stringify(result[0]));
-        const records = [];
-        for (let item of result[0]) {
-            records.push(item.title);
-        }
+        //const records = [];
+        //for (let item of result[0]) {
+        //    records.push(item.title);
+        //}
+        let records = result[0];
         let numberOfRecords = records.length;
         let numberOfPages = Math.ceil(numberOfRecords / 10);
         const pageInt = parseInt(page);
@@ -155,10 +164,11 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
             var partialRecords = records.slice(((pageInt -1) * 10) + 0, ((pageInt -1)* 10) + 11);
         }
 
-        //console.log(partialRecords);
+        console.info( numberOfRecords, numberOfPages, partialRecords);
+
         res.render('bookslist', {
             startChar: startChar,
-            records: partialRecords,
+            results: partialRecords,
             backnext: { 
                 back: pageInt - 1,
                 next: pageInt + 1
@@ -175,6 +185,8 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
 
     }
 })
+
+app.get('/bookdetails/')
 
 //Run the server
 if (API_KEY) {
