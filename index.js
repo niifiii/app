@@ -6,9 +6,11 @@ const withQuery = require('with-Query').default;
 const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const querystring = require('querystring');
+const morgan = require('morgan');
 
 //Init express
 const app = express();
+app.use(morgan('combined'));
 
 //setup handlebars
 app.engine('hbs', handleBars({ 
@@ -236,18 +238,18 @@ app.post('/findreviews', (req, res) => {
     const url = withQuery(
         ENDPOINT,
         {
-            "api-key" : API_KEY,
-            title: querystring.escape(bookTitle)
+            'api-key' : API_KEY,
+            'title' : querystring.escape(bookTitle)
         }
     )
     console.log(url)
 
     //{ status, copyright, num_results, results}
     //console.log(url)
-    let bookReviewsNYT = fetch(url);
+    let bookReviewsNYT = fetch(url);  
     //console.log('hello' + bookReviewsNYT);
     bookReviewsNYT.then ( result => {
-        console.log(JSON.stringify(result));
+        console.log(JSON.stringify(result));////////////////////////// <--------------------------- url works on browser
         return result.json();
     
     })
