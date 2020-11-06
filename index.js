@@ -4,6 +4,7 @@ const handleBars = require('express-handlebars');
 const fetch = require('node-fetch');
 const withQuery = require('with-Query').default;
 const bodyParser = require('body-parser');
+const mysql = require('mysql2/promise');
 
 //Init express
 const app = express();
@@ -29,6 +30,41 @@ app.engine('hbs', handleBars({
     
 app.set('view engine' , 'hbs');
 app.set('views', __dirname + '/views');
+
+//set up database connection
+    // Create the database connection pool
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT) || 3306,
+    database: process.env.DB_NAME || 'goodreads',
+    user: process.env.DB_USER || 'newdude1' , //DO NOT HARD CODE OR HAVE DEFAULTS TO THIS (remember to remove)
+    password: process.env.DB_PASSWD || 'nd11', //DO NOT HARD CODE OR HAVE DEFAULTS TO THIS (remember to remove)
+    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 4,
+    timezone: '+08:00'
+})
+    // Start test DB connection
+const startApp = async (app, pool) => {
+
+    const conn = await pool.getConnection();
+
+    try {
+        
+        console.info('Pinging Database...');
+
+        await conn.ping();
+
+    } catch (e) {
+        console.error('Cannot ping database: ', e)
+
+    } finally {
+
+        await conn.release();
+        console.info('Closed database')
+
+    }
+}
+
+startApp(app, pool); //end optional test
 
 //remember to remove the settings 3000 and nyt apikey
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000;
@@ -58,6 +94,9 @@ app.get('/', (req, res) => {
     
 })
 
+app.get('/booklist/:startCharOfBookTitle', (req, res) => {
+
+})
 
 //Run the server
 if (API_KEY) {
