@@ -49,6 +49,11 @@ app.get('/', (req, res) => {
         NumbersIntegers.push(i);
     }
 
+    res.render('landing', {
+        alphabets: Alphabets,
+        numbers: NumbersIntegers
+    })
+
     console.info(Alphabets, NumbersIntegers)
     
 })

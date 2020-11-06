@@ -1,2 +1,25 @@
 <h1> My Bookstore </h1>
+<table>
+    <tr>
+{{#each alphabets}}
+        <td>
+            <form action="bookslist/{{this}}" method="get">
+                <button type='submit'> {{this}} </button>
+            </form>
+        </td>
+{{/each}}
+</tr>
+</table>
 
+
+<table>
+    <tr>
+{{#each numbers}}
+        <td>
+            <form action="bookslist/{{this}}" method="get">
+                <button type='submit'> {{this}} </button>
+            </form>
+        </td>
+{{/each}}
+</tr>
+</table>
