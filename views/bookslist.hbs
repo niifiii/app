@@ -2,7 +2,7 @@
         {{#each results}}
         <tr>
             <td>
-            <a href="/bookdetails/{{this.book_id}}">{{this.title}}</a>
+            <a href="/bookdetails/{{this.book_id}}?startchar={{this.startChar}}&page={{this.page}}">{{this.title}}</a>
             </td>      
         </tr>
         {{/each}}

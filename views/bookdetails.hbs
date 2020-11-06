@@ -1,0 +1,12 @@
+{{#with result}}
+    Book Title: {{title}}<br>
+    Authors: {{csl authors}}<br>
+    Number of pages: {{pages}}<br>
+    Rating: {{rating}}<br>
+    Number of people who rate the book: {{rating_count}}<br>
+    Genres: {{csl genres}}<br>
+    Book cover: <img src="{{image_url}}"><br>
+{{/with}}
+<form action="/findreview" method='get'>
+    <button type="submit"> Find Review </button>
+</form>

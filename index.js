@@ -23,9 +23,12 @@ function hbsHelpers(handleBars) {
 app.engine('hbs', handleBars({ 
     defaultLayout: 'default.hbs',
     helpers: {
-        inc: function(value, options) {
+        inc: function (value, options) {
                     return parseInt(value) + 1;
-        }}
+        },
+        csl: function (value, options) {
+                    return value.replaceAll("|", ",");
+        }}        
     }))
     
 app.set('view engine' , 'hbs');
@@ -116,6 +119,10 @@ app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
         //var partialBookIDs = bookIDs.slice(0, 11);
         //console.log('typeof: ' + typeof result[0]) <-- this is an object
         let records = result[0];
+        for (item of records) {
+            item.page = 1;
+            item.startChar = startChar;
+        }
         let partialRecords = records.slice(0, 11);
 
         res.render('bookslist', {
@@ -157,6 +164,10 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
         //    records.push(item.title);
         //}
         let records = result[0];
+        for (item of records) {
+            item.page = parseInt(page);
+            item.startChar = startChar;
+        }
         let numberOfRecords = records.length;
         let numberOfPages = Math.ceil(numberOfRecords / 10);
         const pageInt = parseInt(page);
@@ -168,6 +179,7 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
 
         res.render('bookslist', {
             startChar: startChar,
+            
             results: partialRecords,
             backnext: { 
                 back: pageInt - 1,
@@ -186,7 +198,42 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
     }
 })
 
-app.get('/bookdetails/')
+app.get('/bookdetails/:bookID', async (req, res) => {
+    //console.log(bookID)// works!
+    const conn = await pool.getConnection();
+    //console.log('here:' + req.params.startCharOfBookTitle)
+    try {
+        const bookID = req.params.bookID;
+        
+        const startChar = req.query.startchar;
+        const backpage = req.query.page;
+        //console.info(backpage, startChar);
+        res.status(200);
+        res.type('text/html');
+        let SQL_QUERY_FOR_BOOKID = "SELECT title, authors, pages, rating, rating_count, genres, image_url FROM `goodreads`.`book2018` WHERE book_id = ?;";
+
+        const result = await conn.query(SQL_QUERY_FOR_BOOKID, [bookID]);
+        //console.log(JSON.stringify(result[0]));
+        //const records = [];
+        //for (let item of result[0]) {
+        //    records.push(item.title);
+        //}
+        let record = result[0][0];
+        console.log(record);
+        res.render('bookdetails', {
+            result: record,
+            back: backpage,
+            startChar: startChar
+        });
+
+    } catch (e) {
+        console.error('error',  e); 
+
+    } finally {
+        await conn.release()
+
+    }
+})
 
 //Run the server
 if (API_KEY) {
