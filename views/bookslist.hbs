@@ -13,6 +13,8 @@
 </form>
 {{/if}}
 
+{{#if notlastpage}}
 <form method="get" action="/bookslist/{{startChar}}/{{backnext.next}}">
     <button type='submit'> Next </button>
 </form>
+{{/if}}

@@ -119,7 +119,8 @@ app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
                 back: 0,
                 next: 2
             },
-            notpageone: false
+            notpageone: false,
+            notlastpage: true
         })
 
     } catch (e) {
@@ -148,7 +149,7 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
             records.push(item.title);
         }
         let numberOfRecords = records.length;
-        let numberOfPages = numberOfRecords / 10;
+        let numberOfPages = Math.ceil(numberOfRecords / 10);
         const pageInt = parseInt(page);
         if (!(pageInt < 0 || pageInt > numberOfPages)) {
             var partialRecords = records.slice(((pageInt -1) * 10) + 0, ((pageInt -1)* 10) + 11);
@@ -162,7 +163,8 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
                 back: pageInt - 1,
                 next: pageInt + 1
             },
-            notpageone: (pageInt === '1') ? false : true,
+            notpageone: (pageInt === 1) ? false : true,
+            notlastpage: (pageInt === numberOfPages) ? false : true
         })
 
     } catch (e) {
