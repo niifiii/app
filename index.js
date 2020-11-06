@@ -219,7 +219,7 @@ app.get('/bookdetails/:bookID', async (req, res) => {
         //    records.push(item.title);
         //}
         let record = result[0][0];
-        console.log(record);
+        //console.log(record);
         res.render('bookdetails', {
             result: record,
             back: backpage,
@@ -233,6 +233,46 @@ app.get('/bookdetails/:bookID', async (req, res) => {
         await conn.release()
 
     }
+})
+
+app.get('/findreviews/:bookTitle', (req, res) => {
+    const bookTitle = req.params.bookTitle;
+    console.log(bookTitle);
+
+    const ENDPOINT = 'https://api.nytimes.com/svc/books/v3/reviews.json';
+    var apikey = API_KEY;
+
+    const url = withQuery(
+        ENDPOINT,
+        {
+            api_key: API_KEY,
+            title: bookTitle
+        }
+    )
+    console.log(url)
+
+    
+    //console.log(url)
+    //let bookReviewsNYT = fetch(url);
+    //console.log('hello' +bookReviewsNYT);
+    //bookReviewsNYT.then ( result => {
+    //    //console.log(result);
+    //    return result.json();
+    //
+    //})
+    //.then ( result => {
+    //    let onecharacterdataarray = result.data.results;
+    //    console.log('here' + JSON.stringify(onecharacterdataarray))
+    //    res.status(200);
+    //    res.type('text/html');
+    //    res.render('characterpage', {
+    //        character: onecharacterdataarray[0],
+    //        listpage: listpage
+    //    });
+        res.end();
+    //})
+
+    //res.end() <--cannot have this if we have res.render will set the header after res sent
 })
 
 //Run the server

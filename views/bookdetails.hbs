@@ -7,6 +7,6 @@
     Genres: {{csl genres}}<br>
     Book cover: <img src="{{image_url}}"><br>
 {{/with}}
-<form action="/findreview" method='get'>
-    <button type="submit"> Find Review </button>
+<form action="/bookslist/{{startChar}}/{{back}}" method='get'>
+    <button type="submit"> Back </button>
 </form>
