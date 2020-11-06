@@ -5,21 +5,12 @@ const fetch = require('node-fetch');
 const withQuery = require('with-Query').default;
 const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
+const querystring = require('querystring');
 
 //Init express
 const app = express();
 
 //setup handlebars
-function hbsHelpers(handleBars) {
-    return hbs.create({
-      helpers: { // This was missing
-        inc: function(value, options) {
-            return parseInt(value) + 1;
-        }
-      }
-    });
-}
-
 app.engine('hbs', handleBars({ 
     defaultLayout: 'default.hbs',
     helpers: {
@@ -235,9 +226,9 @@ app.get('/bookdetails/:bookID', async (req, res) => {
     }
 })
 
-app.get('/findreviews/:bookTitle', (req, res) => {
-    const bookTitle = req.params.bookTitle;
-    console.log(bookTitle);
+app.post('/findreviews', (req, res) => {
+    const bookTitle = req.body.bookTitle;
+    console.log('1. ' + bookTitle + querystring.escape(bookTitle)); //ok
 
     const ENDPOINT = 'https://api.nytimes.com/svc/books/v3/reviews.json';
     var apikey = API_KEY;
@@ -245,32 +236,56 @@ app.get('/findreviews/:bookTitle', (req, res) => {
     const url = withQuery(
         ENDPOINT,
         {
-            api_key: API_KEY,
-            title: bookTitle
+            "api-key" : API_KEY,
+            title: querystring.escape(bookTitle)
         }
     )
     console.log(url)
 
-    
+    //{ status, copyright, num_results, results}
     //console.log(url)
-    //let bookReviewsNYT = fetch(url);
-    //console.log('hello' +bookReviewsNYT);
-    //bookReviewsNYT.then ( result => {
-    //    //console.log(result);
-    //    return result.json();
-    //
-    //})
-    //.then ( result => {
-    //    let onecharacterdataarray = result.data.results;
-    //    console.log('here' + JSON.stringify(onecharacterdataarray))
-    //    res.status(200);
-    //    res.type('text/html');
-    //    res.render('characterpage', {
-    //        character: onecharacterdataarray[0],
-    //        listpage: listpage
-    //    });
+    let bookReviewsNYT = fetch(url);
+    //console.log('hello' + bookReviewsNYT);
+    bookReviewsNYT.then ( result => {
+        console.log(JSON.stringify(result));
+        return result.json();
+    
+    })
+    .then ( result => {
+        if (result.status !== 'ok') {
+            res.status(200);
+            res.type('text/html');
+            res.send = '<h1> Error </h1>';
+            console.log('error page')
+            return null;
+        }
+
+        if (results.num_results <= 0) {
+            console.log('no results found')
+            res.status(200);
+            res.type('text/html');
+            res.send = '<h1> No results found </h1>'
+            return null;
+        }
+
+
+
+        let listofreviews = result.results;
+        console.log('here' + JSON.stringify(listofreviews)    );
+
+        for (let item of listofreviews) {
+            item.copyright = result.copyright
+        }
+
+        let backdetailpage = null;
+        res.status(200);
+        res.type('text/html');
+        res.render('findreviews', {
+            listofreviews: listofreviews,
+            backdetailpage: backdetailpage
+        });
         res.end();
-    //})
+    })
 
     //res.end() <--cannot have this if we have res.render will set the header after res sent
 })

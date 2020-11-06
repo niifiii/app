@@ -10,3 +10,10 @@
 <form action="/bookslist/{{startChar}}/{{back}}" method='get'>
     <button type="submit"> Back </button>
 </form>
+
+{{#with result}}
+<form action="/findreviews" method='post'>
+    <input type="text" name="bookTitle" value="{{title}}" hidden>
+    <button type="submit"> Find Reviews </button>
+</form>
+{{/with}}
