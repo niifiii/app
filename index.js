@@ -94,8 +94,35 @@ app.get('/', (req, res) => {
     
 })
 
-app.get('/booklist/:startCharOfBookTitle', (req, res) => {
+app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
+    const conn = await pool.getConnection();
+    console.log('here:' + req.params.startCharOfBookTitle)
+    try {
+        const startChar = req.params.startCharOfBookTitle;
+        //console.log(startChar)
+        res.status(200);
+        res.type('text/html');
+        let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
 
+        
+        const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
+        //console.log(JSON.stringify(result[0]));
+        const records = [];
+        for (let item of result[0]) {
+            records.push(item.title);
+        }
+        //console.log(records);
+        res.render('bookslist', {
+            records: records,
+        })
+
+    } catch (e) {
+        console.error('error',  e); 
+
+    } finally {
+        await conn.release()
+
+    }
 })
 
 //Run the server
