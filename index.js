@@ -104,26 +104,30 @@ app.get('/bookslist/:startCharOfBookTitle', async (req, res) => {
         res.type('text/html');
         let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
 
-        
         const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
         //console.log(JSON.stringify(result[0]));
         const records = [];
         for (let item of result[0]) {
             records.push(item.title);
         }
-        //console.log(records);
+        var partialRecords = records.slice(0, 11);
+
         res.render('bookslist', {
-            records: records,
+            startChar: startChar,
+            records: partialRecords,
+            backnext: { 
+                back: 0,
+                next: 2
+            },
+            notpageone: false
         })
 
     } catch (e) {
         console.error('error',  e); 
-
     } finally {
         await conn.release()
-
     }
-})
+}) 
 
 app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
     const conn = await pool.getConnection();
@@ -137,7 +141,6 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
         res.type('text/html');
         let SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE = "SELECT title FROM `goodreads`.`book2018` WHERE `title` LIKE ? ";
 
-        
         const result = await conn.query(SQL_QUERY_FOR_START_CHAR_OF_BOOK_TITLE, [startChar + '%']);
         //console.log(JSON.stringify(result[0]));
         const records = [];
@@ -159,6 +162,7 @@ app.get('/bookslist/:startCharOfBookTitle/:page', async (req, res) => {
                 back: pageInt - 1,
                 next: pageInt + 1
             },
+            notpageone: (pageInt === '1') ? false : true,
         })
 
     } catch (e) {

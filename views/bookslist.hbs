@@ -7,10 +7,11 @@
         </tr>
         {{/each}}
 </table>
-
+{{#if notpageone}}
 <form method="get" action="/bookslist/{{startChar}}/{{backnext.back}}">
     <button type='submit'> Back </button>
 </form>
+{{/if}}
 
 <form method="get" action="/bookslist/{{startChar}}/{{backnext.next}}">
     <button type='submit'> Next </button>
